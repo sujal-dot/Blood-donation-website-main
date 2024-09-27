@@ -1,26 +1,42 @@
 const express = require("express");
 const router = express.Router();
+const path = require('path');
 const Receiver = require("../models/receiver");
 
 router.post("/Create", async function (req, res) {
     try {
         // Log the request body for debugging
-        console.log("Request Body:", req.body);
+        const body = await req.body;
+        console.log("Request Body:", body);
+        if (req.files == null) {
+            return res.send({
+                status: false,
+                data: "No file uploaded."
+            });
+        }
 
-        // Create a new instance of the Receiver model with the new fields
-        const newReceiver = new Receiver({
-            fullName: req.body.fullName,  // Match with frontend 'fullName'
-            email: req.body.email,  // Match with frontend 'email'
-            gender: req.body.gender,  // Match with frontend 'gender'
-            phoneNo: req.body.phone,  // Match with frontend 'phone' (was phoneNo)
-            address: req.body.address,  // Match with frontend 'address'
-            bloodType: req.body.bloodType,  // Match with frontend 'bloodType'
-            idProof: req.file ? req.file.path : null  // Match with frontend file input
-        });
+        // Move the file to the uploads folder with a new name
+        const fileExtension = path.extname(req.files.idProof.name);
+
+        const uploadPath = "./public/" + body.phone + fileExtension;
+        const file = req.files.idProof;
+        // const newFileName = body.phone + "_" + file.name;
+        file.mv(uploadPath);
+
 
 
         // Save the new receiver to the database
-        const receiverData = await newReceiver.save();
+        const receiverData = Receiver.create({
+            fullName: body.fullName,  // Match with frontend 'fullName'
+            email: body.email,  // Match with frontend 'email'
+            gender: body.gender,  // Match with frontend 'gender'
+            phoneNo: body.phone,  // Match with frontend 'phone' (was phoneNo)
+            address: body.address,  // Match with frontend 'address'
+            bloodType: body.bloodType,  // Match with frontend 'bloodType'
+            idProof: body.phone + fileExtension// Match with frontend file input
+        });
+        console.log(receiverData);
+
 
         // Check if the data was saved successfully
         if (receiverData) {
