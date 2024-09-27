@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor List</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Available Donors</h1>
+    <table id="donorTable">
+        <thead>
+            <tr>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Blood Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Donor rows will be added here by JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // Fetch data from backend and display it in the table
+        fetch('http://localhost:3000/api/donors')
+            .then(response => response.json())
+            .then(data => {
+                const donorTableBody = document.querySelector('#donorTable tbody');
+
+                data.forEach(donor => {
+                    const row = document.createElement('tr');
+                    
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = donor.name;
+                    row.appendChild(nameCell);
+
+                    const emailCell = document.createElement('td');
+                    emailCell.textContent = donor.email;
+                    row.appendChild(emailCell);
+
+                    const phoneCell = document.createElement('td');
+                    phoneCell.textContent = donor.phoneNo;
+                    row.appendChild(phoneCell);
+
+                    const bloodTypeCell = document.createElement('td');
+                    bloodTypeCell.textContent = donor.bloodType;
+                    row.appendChild(bloodTypeCell);
+
+                    donorTableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching donor data:', error));
+    </script>
+</body>
+</html>
